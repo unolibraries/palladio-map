@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8">
+    <title>Palladio Embed App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Palladio -->
+    <link type="text/css" href="bower_components/palladio/palladio.css" rel="stylesheet" />
+    <link type="text/css" href="css/palladio-embed-app.css" rel="stylesheet" />
+    <script src="bower_components/palladio/palladio.js"></script>
+    <script src="js/app.js"></script>
+
+  </head>
+
+  <body>
+    <div id="main" class="container-fluid">
+      <div class="row">
+        <div class="col-md-9">
+          <!-- Visualization display area -->
+          <h2>Your visualizations will display here</h2>
+          <div id="components">
+          </div>
+        </div>
+        <div class="col-md-3" ng-app="palladioEmbedApp">
+          <!-- Visualization configuration area -->
+          <h2>Configure here</h2>
+          <div ng-controller="EmbedCtrl">
+            
+            <!-- Load file -->
+            <div data-ng-hide="file">
+              <div data-ng-click="triggerDataModelSelector()">
+                <button class="btn btn-default">Load Palladio Save File</button>
+              </div>
+              <input type="file" id="dataModelSelector" style="display:none" onchange="angular.element(this).scope().loadDataModel(this)" />
+            </div>
+            
+            <!-- Add components -->
+            <div data-ng-show="file">
+              <div ng-repeat="visualization in visualizations" data-ng-click="addVisualization(visualization)">
+                {{visualization.description}}
+              </div>
+              <div data-ng-show="visualizations.length === 0">
+                <button class="btn btn-default" data-ng-click="startOver()">Start over</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+        <!--<div class="row-fluid">
+            <h1 class="col-md-12">Some explanation</h1>
+        </div>
+        <div class="row-fluid">
+            <p class="col-md-12">Some text goes here. We'll explain our data and the visualizations that appears below. Important to set context.</p>
+        </div>
+        <div class="row-fluid">
+            <div class="col-md-10 col-md-offset-1" id="facet-filter-here"></div>
+        </div>
+        <div class="row-fluid">
+            <p class="col-md-12">Text can be interspersed with visualizations, of course.</p>
+        </div>
+        <div class="row-fluid">
+            <div class="col-md-10 col-md-offset-1" id="table-view-here"></div>
+        </div>
+        <div class="row-fluid">
+            <div class="col-md-10 col-md-offset-1" id="timespan-here"></div>
+        </div>
+        <div class="row-fluid">
+            <div class="col-md-10 col-md-offset-1" id="timeline-here"></div>
+        </div>
+        <div class="row-fluid">
+            <div class="col-md-10 col-md-offset-1" id="short-timeline-here"></div>
+        </div>
+
+        <div class="row-fluid">
+            <h1 class="col-md-12">Second set of components</h1>
+        </div>
+        <div class="row-fluid">
+            <p class="col-md-12">This is a second component defined on the same data, but not linked to the other components. Filtering on this one doesn't filter above. And filtering above doesn't filter on this one.</p>
+        </div>
+        <div class="row-fluid">
+            <div class="col-md-10 col-md-offset-1" id="facet-filter-here-2"></div>
+        </div>
+        <div class="row-fluid">
+            <div class="col-md-10 col-md-offset-1" id="map-view-here"></div>
+        </div>
+        <div class="row-fluid">
+            <div class="col-md-10 col-md-offset-1" id="graph-view-here"></div>
+        </div>
+
+        <script>
+            var components = startPalladio();
+
+            components.loadData('sample.json', function() {
+                components.add('facet', "#facet-filter-here", {
+                    height: "300px",
+                    showControls: false,
+                    showSettings: false,
+                    showAccordion: false,
+                    showDropArea: false,
+                    dimensions: components.dimensions()
+                        .filter(function(d) { return ["Position", "Name", "Gender", "Birthplace"].indexOf(d.key) !== -1; })
+                });
+
+                components.add('table', "#table-view-here", {
+                    height: "300px",
+                    showSettings: false,
+                    row: components.dimensions()
+                        .filter(function(d) { return d.key === "Name"; })[0],
+                    dimensions: components.dimensions()
+                        .filter(function(d) { return ["Position", "Gender", "Birthdate", "Date of Death"].indexOf(d.key) !== -1; })
+                });
+
+                var timespan = components.add('timespan', "#timespan-here", {
+                    showControls: false,
+                    showSettings: false,
+                    showAccordion: false
+                });
+
+                var timeline = components.add('timeline', "#timeline-here", {
+                    showControls: false,
+                    showSettings: false,
+                    showAccordion: false,
+                    height: 300
+                });
+
+                var shortTimeline = components.add('timeline', "#short-timeline-here", {
+                    showControls: false,
+                    showSettings: false,
+                    showAccordion: false,
+                    height: 80
+                });
+
+                var timespanFunc = function () {
+                    timespan.getOptions().startDimension(components.dimensions().filter(function(d) {
+                        return d.key === 'Birthdate'; })[0]);
+                    timespan.getOptions().endDimension(components.dimensions().filter(function(d) {
+                        return d.key === 'Date of Death'; })[0]);
+                };
+                setTimeout(timespanFunc, 100);
+
+                var timelineFunc = function () {
+                    timeline.getOptions().date(components.dimensions().filter(function(d) {
+                        return d.key === 'Date of Death'; })[0]);
+                    timeline.getOptions().group(components.dimensions().filter(function(d) {
+                        return d.key === 'Position'; })[0]);
+                };
+                setTimeout(timelineFunc, 100);
+
+                var shortTimelineFunc = function () {
+                    shortTimeline.getOptions().date(components.dimensions().filter(function(d) {
+                        return d.key === 'Birthdate'; })[0]);
+                    shortTimeline.getOptions().group(components.dimensions().filter(function(d) {
+                         return d.key === 'Position'; })[0]);
+                };
+                setTimeout(shortTimelineFunc, 100);
+            });
+
+        </script>-->
+
+  </body>
+</html>

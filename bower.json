@@ -1,0 +1,22 @@
+{
+  "name": "palladio-embed-app",
+  "authors": [
+    "Ethan Jewett <ethan.jewett@coredatra.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "BSD",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "palladio": "1.2"
+  }
+}
