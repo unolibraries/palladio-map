@@ -1,4 +1,4 @@
-var app = angular.module('palladioEmbedApp', [])
+var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
   .controller('EmbedCtrl', ['$scope', function($scope) {
     var components = startPalladio();
     var loadPromise = undefined;
@@ -6,9 +6,24 @@ var app = angular.module('palladioEmbedApp', [])
     $scope.file = undefined;
     $scope.visualizations = [];
     
+    $scope.embedCode = [
+      '<link type="text/css" href="bower_components/palladio/palladio.css" rel="stylesheet" />',
+      '<link href="http://netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.css" rel="stylesheet">',
+      '<script src="bower_components/palladio/palladio.js"></script>',
+      '<script>',
+      "var components = startPalladio();",
+      "components.loadData('url-for-your-file.json', function() {",
+      "});",
+      '</script>'];
+    $scope.embedCodeString = $scope.embedCode.join("\n");
+    
+    $scope.editorOptions = {
+        lineWrapping : true,
+        lineNumbers: true,
+        mode: 'html',
+    };
+    
     $scope.addVisualization = function(visualization) {
-      console.log("Adding");
-      console.log(visualization);
       
       // Remove the visualization from the available list
       $scope.visualizations.splice($scope.visualizations.indexOf(visualization), 1);
@@ -17,15 +32,19 @@ var app = angular.module('palladioEmbedApp', [])
         switch(visualization.type) {
           case 'timeline':
             loadTimeline(visualization);
+            embedCodeFromFunction(loadTimeline, visualization);
             break;
           case 'mapView':
             loadMap(visualization);
+            embedCodeFromFunction(loadMap, visualization);
             break;
           case 'graphView':
             loadGraph(visualization);
+            embedCodeFromFunction(loadGraph, visualization);
             break;
           case 'facet':
             loadFacet(visualization);
+            embedCodeFromFunction(loadFacet, visualization);
             break;
         }
       });
@@ -33,65 +52,48 @@ var app = angular.module('palladioEmbedApp', [])
     
     function loadTimeline(visualization) {
       var newId = appendNewDivWithID(visualization);
-      
-      var timeline = components.add('timeline', newId, {
+      var timeline = components.promiseAdd('timeline', newId, {
         showControls: false,
         showSettings: false,
         showAccordion: false,
         height: 300
+      }).then(function(opts) {
+        opts.date(components.dimensionFromKey(visualization.importJson.dateProp));
+        opts.group(components.dimensionFromKey(visualization.importJson.groupProp));
       });
-      
-      var timelineFunc = function () {
-        timeline.getOptions().date(components.dimensions().filter(function(d) {
-          return d.key === visualization.importJson.dateProp;
-        })[0]);
-        
-        timeline.getOptions().group(components.dimensions().filter(function(d) {
-          return d.key === visualization.importJson.groupProp;
-        })[0]);
-      };
-      window.setTimeout(timelineFunc);
     }
     
     function loadMap(visualization) {
       var newId = appendNewDivWithID(visualization);
-      
-      var map = components.add('map', newId, {
+      var map = components.promiseAdd('map', newId, {
         height: "300px",
         showSettings: false
+      }).then(function(opts) {
+        opts.importState(visualization.importJson );
       });
-      
-      window.setTimeout(function() { map.getOptions().importState(visualization.importJson)});
     }
     
     function loadGraph(visualization) {
       var newId = appendNewDivWithID(visualization);
-      
-      var graph = components.add('graph', newId, {
+      var graph = components.promiseAdd('graph', newId, {
         height: "300px",
         showSettings: false
-      });
-      
-      window.setTimeout(function() {
-        var graphOpts = graph.getOptions();
-        graphOpts.source(components.dimensions().filter(function(d) {
-          return d.key === visualization.importJson.sourceDimension; })[0]);
-        graphOpts.target(components.dimensions().filter(function(d) {
-          return d.key === visualization.importJson.targetDimension; })[0]);
-        graphOpts.nodeSize(visualization.importJson.nodeSize);
+      }).then(function(opts) {
+        opts.source(components.dimensionFromKey(visualization.importJson.sourceDimension));
+        opts.target(components.dimensionFromKey(visualization.importJson.targetDimension));
+        opts.nodeSize(visualization.importJson.nodeSize);
       });
     }
     
     function loadFacet(visualization) {
       var newId = appendNewDivWithID(visualization);
-      components.add('facet', newId, {
+      components.promiseAdd('facet', newId, {
         height: "300px",
         showControls: false,
         showSettings: false,
         showAccordion: false,
         showDropArea: false,
-        dimensions: components.dimensions()
-          .filter(function(d) { return visualization.importJson.dimKeys.indexOf(d.key) !== -1; })
+        dimensions: components.dimensionsFromKeys(visualization.importJson.dimKeys)
       });
     }
     
@@ -102,6 +104,35 @@ var app = angular.module('palladioEmbedApp', [])
       document.getElementById('components').appendChild(newDiv)
       newId = "#" + newId;
       return newId;
+    }
+    
+    function embedCodeFromFunction(func, vis) {
+      var replacements = {
+        'var timeline = ': '',
+        'newId': '#' + vis.type + '-id-here',
+        'visualization.importJson.dateProp': JSON.stringify(vis.importJson.dateProp),
+        'visualization.importJson.groupProp': JSON.stringify(vis.importJson.groupProp),
+        'visualization.importJson.dimKeys': JSON.stringify(vis.importJson.dimKeys),
+        'visualization.importJson ': JSON.stringify(vis.importJson),
+        'visualization.importJson.sourceDimension': JSON.stringify(vis.importJson.sourceDimension),
+        'visualization.importJson.targetDimension': JSON.stringify(vis.importJson.targetDimension),
+        'visualization.importJson.nodeSize': JSON.stringify(vis.importJson.nodeSize)
+      }
+      var str = func.toString();
+      console.log(str);
+      for(var r in replacements) {
+        str = str.replace(new RegExp(r, 'g'), replacements[r]);
+      }
+      console.log(str);
+      var a = str.split("\n");
+      a.pop();
+      a.shift();
+      a.shift();
+      for(var i=0; i < a.length; i++) {
+        $scope.embedCode.splice($scope.embedCode.length-2, 0, a[i]); 
+      }
+      $scope.embedCodeString = $scope.embedCode.join("\n");
+      $scope.$digest();
     }
     
     $scope.triggerDataModelSelector = function () {

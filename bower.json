@@ -17,6 +17,7 @@
     "tests"
   ],
   "dependencies": {
-    "palladio": "1.2"
+    "palladio": "1.2",
+    "angular-ui-codemirror": "~0.3.0"
   }
 }
