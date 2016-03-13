@@ -49,9 +49,12 @@
               <div data-ng-show="visualizations.length === 0">
                 <button class="btn btn-default" data-ng-click="startOver()">Start over</button>
               </div>
-              <div>
-                <ui-codemirror ui-codemirror-opts="editorOptions" ng-model="embedCodeString" ui-refresh="cmRefresh"></ui-codemirror>
-              </div>
+            </div>
+            
+            <h2>Instructions</h2>
+            <div>
+              Put this code at the end of your HTML page &lt;body&gt; tag, right before the &lt;/body&gt;
+              <ui-codemirror ui-codemirror-opts="editorOptions" ng-model="embedCodeString" ui-refresh="cmRefresh"></ui-codemirror>
             </div>
           </div>
         </div>

@@ -7,6 +7,7 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
     $scope.visualizations = [];
     
     $scope.embedCode = [
+      '<meta charset="utf-8">',
       '<link type="text/css" href="bower_components/palladio/palladio.css" rel="stylesheet" />',
       '<link href="http://netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.css" rel="stylesheet">',
       '<script src="bower_components/palladio/palladio.js"></script>',
@@ -109,7 +110,9 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
     function embedCodeFromFunction(func, vis) {
       var replacements = {
         'var timeline = ': '',
-        'newId': '#' + vis.type + '-id-here',
+        'var map = ': '',
+        'var graph = ': '',
+        'newId': '\'#' + vis.type + '-id-here\'',
         'visualization.importJson.dateProp': JSON.stringify(vis.importJson.dateProp),
         'visualization.importJson.groupProp': JSON.stringify(vis.importJson.groupProp),
         'visualization.importJson.dimKeys': JSON.stringify(vis.importJson.dimKeys),
@@ -119,11 +122,9 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
         'visualization.importJson.nodeSize': JSON.stringify(vis.importJson.nodeSize)
       }
       var str = func.toString();
-      console.log(str);
       for(var r in replacements) {
         str = str.replace(new RegExp(r, 'g'), replacements[r]);
       }
-      console.log(str);
       var a = str.split("\n");
       a.pop();
       a.shift();
