@@ -18,6 +18,7 @@
   ],
   "dependencies": {
     "palladio": "1.2",
-    "angular-ui-codemirror": "~0.3.0"
+    "angular-ui-codemirror": "~0.3.0",
+    "palladio-timeline-component": "~1.0.1"
   }
 }
