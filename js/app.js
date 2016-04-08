@@ -1,6 +1,6 @@
 var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
   .controller('EmbedCtrl', ['$scope', function($scope) {
-    var components = startPalladio(['palladioTimelineComponent']);
+    var components = startPalladio(['palladioTimelineComponent', 'palladioFacetComponent']);
     var loadPromise = undefined;
     
     $scope.file = undefined;

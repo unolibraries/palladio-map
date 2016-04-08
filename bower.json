@@ -19,6 +19,7 @@
   "dependencies": {
     "palladio": "1.2",
     "angular-ui-codemirror": "~0.3.0",
-    "palladio-timeline-component": "~1.0.1"
+    "palladio-timeline-component": "~1.0.1",
+    "palladio-facet-component": "~1.0.0"
   }
 }
