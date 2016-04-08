@@ -1,6 +1,6 @@
 var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
   .controller('EmbedCtrl', ['$scope', function($scope) {
-    var components = startPalladio(['palladioTimelineComponent', 'palladioFacetComponent']);
+    var components = startPalladio(['palladioTimelineComponent', 'palladioFacetComponent', 'palladioTimespanComponent']);
     var loadPromise = undefined;
     
     $scope.file = undefined;
@@ -47,6 +47,10 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
             loadFacet(visualization);
             embedCodeFromFunction(loadFacet, visualization);
             break;
+          case 'timespan':
+            loadTimespan(visualization);
+            embedCodeFromFunction(loadTimespan, visualization);
+            break;
         }
       });
     }
@@ -61,6 +65,22 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
       }).then(function(opts) {
         opts.date(components.dimensionFromKey(visualization.importJson.dateProp));
         opts.group(components.dimensionFromKey(visualization.importJson.groupProp));
+      });
+    }
+    
+    function loadTimespan(visualization) {
+      var newId = appendNewDivWithID(visualization);
+      components.promiseAdd('timespan', newId, {
+        showControls: false,
+        showSettings: false,
+        showAccordion: false,
+        height: 300
+      }).then(function(opts) {
+        opts.startDimension(components.dimensionFromKey(visualization.importJson.dateStartDim));
+        opts.endDimension(components.dimensionFromKey(visualization.importJson.dateEndDim));
+        opts.tooltipDimension(components.dimensionFromKey(visualization.importJson.tooltipLabelDim));
+        // Group dimension is currently not saved in file
+        // opts.groupDimension(components.dimensionFromKey(visualization.importJson.groupDim));
       });
     }
     
@@ -119,7 +139,10 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
         'visualization.importJson ': JSON.stringify(vis.importJson),
         'visualization.importJson.sourceDimension': JSON.stringify(vis.importJson.sourceDimension),
         'visualization.importJson.targetDimension': JSON.stringify(vis.importJson.targetDimension),
-        'visualization.importJson.nodeSize': JSON.stringify(vis.importJson.nodeSize)
+        'visualization.importJson.nodeSize': JSON.stringify(vis.importJson.nodeSize),
+        'visualization.importJson.dateStartDim': JSON.stringify(vis.importJson.dateStartDim),
+        'visualization.importJson.dateEndDim': JSON.stringify(vis.importJson.dateEndDim),
+        'visualization.importJson.tooltipLabelDim': JSON.stringify(vis.importJson.tooltipLabelDim)
       }
       var str = func.toString();
       for(var r in replacements) {
@@ -157,7 +180,7 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
             s.visualizations.push({type: "timeline", description: "Timeline", importJson: f});
           });
           filters.importJson.partimes.forEach(function(f) {
-            s.visualizations.push({type: "partime", description: "Timespan", importJson: f});
+            s.visualizations.push({type: "timespan", description: "Timespan", importJson: f});
           });
           
           var mapView = s.file.vis.filter(function(v) { return v.type === "mapView"; })[0];
