@@ -43,6 +43,10 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
             loadGraph(visualization);
             embedCodeFromFunction(loadGraph, visualization);
             break;
+          case 'tableView':
+            loadTable(visualization);
+            embedCodeFromFunction(loadTable, visualization);
+            break;
           case 'facet':
             loadFacet(visualization);
             embedCodeFromFunction(loadFacet, visualization);
@@ -106,6 +110,17 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
       });
     }
     
+    function loadTable(visualization) {
+      var newId = appendNewDivWithID(visualization);
+      components.promiseAdd('table', newId, {
+        height: "300px",
+        showSettings: false,
+        row: components.dimensionFromKey(visualization.importJson.countDim.key),
+        dimensions: components
+          .dimensionsFromKeys(visualization.importJson.tableDimensions.map(function(d) { return d.key; }))
+      });
+    }
+    
     function loadFacet(visualization) {
       var newId = appendNewDivWithID(visualization);
       components.promiseAdd('facet', newId, {
@@ -142,7 +157,9 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
         'visualization.importJson.nodeSize': JSON.stringify(vis.importJson.nodeSize),
         'visualization.importJson.dateStartDim': JSON.stringify(vis.importJson.dateStartDim),
         'visualization.importJson.dateEndDim': JSON.stringify(vis.importJson.dateEndDim),
-        'visualization.importJson.tooltipLabelDim': JSON.stringify(vis.importJson.tooltipLabelDim)
+        'visualization.importJson.tooltipLabelDim': JSON.stringify(vis.importJson.tooltipLabelDim),
+        'visualization.importJson.countDim.key': JSON.stringify(vis.importJson.countDim.key),
+        'visualization.importJson.tableDimensions.map\\(function\\(d\\) { return d.key; }\\)': JSON.stringify(vis.importJson.tableDimensions.map(function(d) { return d.key; }))
       }
       var str = func.toString();
       for(var r in replacements) {
@@ -190,6 +207,11 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
           var graphView = s.file.vis.filter(function(v) { return v.type === "graphView"; })[0];
           graphView.description = "Graph";
           s.visualizations.push(graphView);
+          
+          var tableView = s.file.vis.filter(function(v) { return v.type === 'tableView'; })[0];
+          tableView.description = "Table";
+          s.visualizations.push(tableView);
+     
         });
       };
       reader.readAsText(input.files[0]);
