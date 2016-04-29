@@ -1,6 +1,6 @@
 var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
   .controller('EmbedCtrl', ['$scope', function($scope) {
-    var components = startPalladio(['palladioTimelineComponent', 'palladioFacetComponent', 'palladioTimespanComponent', 'palladioGraphComponent', 'palladioMapComponent', 'palladioTableComponent']);
+    var components = startPalladio(['palladioTimelineComponent', 'palladioFacetComponent', 'palladioTimespanComponent', 'palladioGraphComponent', 'palladioMapComponent', 'palladioTableComponent', 'palladioCardsComponent']);
     var loadPromise = undefined;
     
     $scope.file = undefined;
@@ -46,6 +46,10 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
           case 'tableView':
             loadTable(visualization);
             embedCodeFromFunction(loadTable, visualization);
+            break;
+          case 'listView':
+            loadCards(visualization);
+            embedCodeFromFunction(loadCards, visualization);
             break;
           case 'facet':
             loadFacet(visualization);
@@ -121,6 +125,20 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
       });
     }
     
+    function loadCards(visualization) {
+      var newId = appendNewDivWithID(visualization);
+      components.promiseAdd('cards', newId, {
+        height: "300px",
+        showSettings: false,
+        titleDim: components.dimensionFromKey(visualization.importJson.titleDim),
+        subtitleDim: components.dimensionFromKey(visualization.importJson.subtitleDim),
+        textDim: components.dimensionFromKey(visualization.importJson.textDim),
+        linkDim: components.dimensionFromKey(visualization.importJson.linkDim),
+        imgUrlDim: components.dimensionFromKey(visualization.importJson.imgurlDim),
+        sortDim: components.dimensionFromKey(visualization.importJson.sortDim)
+      });
+    }
+    
     function loadFacet(visualization) {
       var newId = appendNewDivWithID(visualization);
       components.promiseAdd('facet', newId, {
@@ -158,8 +176,14 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
         'visualization.importJson.dateStartDim': JSON.stringify(vis.importJson.dateStartDim),
         'visualization.importJson.dateEndDim': JSON.stringify(vis.importJson.dateEndDim),
         'visualization.importJson.tooltipLabelDim': JSON.stringify(vis.importJson.tooltipLabelDim),
-        'visualization.importJson.countDim.key': JSON.stringify(vis.importJson.countDim.key),
-        'visualization.importJson.tableDimensions.map\\(function\\(d\\) { return d.key; }\\)': JSON.stringify(vis.importJson.tableDimensions.map(function(d) { return d.key; }))
+        'visualization.importJson.countDim.key': vis.importJson.countDim ? JSON.stringify(vis.importJson.countDim.key) : "",
+        'visualization.importJson.tableDimensions.map\\(function\\(d\\) { return d.key; }\\)': vis.importJson.tableDimensions ? JSON.stringify(vis.importJson.tableDimensions.map(function(d) { return d.key; })) : "",
+        'visualization.importJson.titleDim': vis.importJson.titleDim,
+        'visualization.importJson.subtitleDim': vis.importJson.subtitleDim,
+        'visualization.importJson.textDim': vis.importJson.textDim,
+        'visualization.importJson.linkDim': vis.importJson.linkDim,
+        'visualization.importJson.imgurlDim': vis.importJson.imgurlDim,
+        'visualization.importJson.sortDim': vis.importJson.sortDim
       }
       var str = func.toString();
       for(var r in replacements) {
@@ -211,6 +235,10 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
           var tableView = s.file.vis.filter(function(v) { return v.type === 'tableView'; })[0];
           tableView.description = "Table";
           s.visualizations.push(tableView);
+          
+          var cardView = s.file.vis.filter(function(v) { return v.type === 'listView'; })[0];
+          cardView.description = "Cards";
+          s.visualizations.push(cardView);
      
         });
       };
