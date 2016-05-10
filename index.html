@@ -18,6 +18,10 @@
     
     <link rel="stylesheet" type="text/css" href="bower_components/codemirror/lib/codemirror.css">
     <script type="text/javascript" src="bower_components/codemirror/lib/codemirror.js"></script>
+    <script type="text/javascript" src="bower_components/codemirror/mode/xml/xml.js"></script>
+    <script type="text/javascript" src="bower_components/codemirror/mode/javascript/javascript.js"></script>
+    <script type="text/javascript" src="bower_components/codemirror/mode/css/css.js"></script>
+    <script type="text/javascript" src="bower_components/codemirror/mode/htmlmixed/htmlmixed.js"></script>
 
     <script src="bower_components/palladio/palladio.js"></script>
     <script src="bower_components/palladio-timeline-component/dist/palladio-timeline-component.min.js"></script>
@@ -27,7 +31,7 @@
     <script src="bower_components/palladio-map-component/dist/palladio-map-component.min.js"></script>
     <script src="bower_components/palladio-table-component/dist/palladio-table-component.min.js"></script>
     <script src="bower_components/palladio-cards-component/dist/palladio-cards-component.js"></script>
-    <script type="text/javascript" src="bower_components/angular-ui-codemirror/ui-codemirror.js"></script>
+    <script type="text/javascript" src="bower_components/angular-ui-codemirror/ui-codemirror.min.js"></script>
     
     <script src="js/app.js"></script>
 
@@ -48,7 +52,7 @@
           <div ng-controller="EmbedCtrl">
             
             <!-- Load file -->
-            <div data-ng-hide="file">
+            <div data-ng-hide="file" class="row">
               <div data-ng-click="triggerDataModelSelector()">
                 <button class="btn btn-default">Load Palladio Save File</button>
               </div>
@@ -56,7 +60,7 @@
             </div>
             
             <!-- Add components -->
-            <div data-ng-show="file">
+            <div data-ng-show="file" class="row">
               <div ng-repeat="visualization in visualizations" data-ng-click="addVisualization(visualization)">
                 {{visualization.description}}
               </div>
@@ -65,10 +69,39 @@
               </div>
             </div>
             
-            <h2>Instructions</h2>
-            <div>
-              Put this code at the end of your HTML page &lt;body&gt; tag, right before the &lt;/body&gt;
-              <ui-codemirror ui-codemirror-opts="editorOptions" ng-model="embedCodeString" ui-refresh="cmRefresh"></ui-codemirror>
+            <div data-ng-show="file" class="row">
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#instructions-modal">Embedding Instructions</button>
+            </div>
+            <div class="modal fade" id="instructions-modal" tabindex="-1" role="dialog">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Instructions for Embedding Components</h4>
+                  </div>
+                  <div class="modal-body">
+                    <p>To use these components in your own web page, put this code at the end of your HTML page <code>&lt;body&gt;</code> tag, right before the <code>&lt;/body&gt;</code> (If you don't see anything below, click in the box and the code should appear. Right-click to choose "Select all" for copying.)</p>
+                    
+                    <p><ui-codemirror ui-codemirror-opts="editorOptions" ng-model="embedCodeString" ui-refresh="cmRefresh"></ui-codemirror></p>
+                    
+                    <p>If you don't have Node.js installed, get it here: <a href="https://nodejs.org/">https://nodejs.org/</a></p>
+                    
+                    <p>If you don't have Bower installed, run the command: <code>npm install -g bower</code></p>
+                    
+                    <p>Then in the same directory as the HTML file where you are using these components, run (all on one line):</p>
+                    <p><code>bower install palladio#1.2.0-beta.07 palladio-facet-component palladio-timeline-component palladio-timespan-component palladio-graph-component palladio-map-component palladio-table-component palladio-cards-component</code></p>
+                    
+                    <p>If you want to serve the page locally to try it out, start a local web server with: <code>python -m SimpleHTTPServer</code></p>
+                    
+                    <p>Alternatively, if you don't have Python installed, you can run a local web server like this: <code>npm install http-server -g; http-server -p 8000</code></p>
+                    
+                    <p>You site will be available at <a href="http://localhost:8000/">http://localhost:8000/</a></p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

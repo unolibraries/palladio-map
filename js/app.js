@@ -9,10 +9,31 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
     $scope.embedCode = [
       '<meta charset="utf-8">',
       '<link type="text/css" href="bower_components/palladio/palladio.css" rel="stylesheet" />',
+      '<link type="text/css" href="bower_components/palladio-timeline-component/dist/palladio-timeline-component.css" rel="stylesheet" />',
+      '<link type="text/css" href="bower_components/palladio-facet-component/dist/palladio-facet-component.css" rel="stylesheet" />',
+      '<link type="text/css" href="bower_components/palladio-timespan-component/dist/palladio-timespan-component.css" rel="stylesheet" />',
+      '<link type="text/css" href="bower_components/palladio-graph-component/dist/palladio-graph-component.css" rel="stylesheet" />',
+      '<link type="text/css" href="bower_components/palladio-map-component/dist/palladio-map-component.css" rel="stylesheet" />',
+      '<link type="text/css" href="bower_components/palladio-table-component/dist/palladio-table-component.css" rel="stylesheet" />',
+      '<link type="text/css" href="bower_components/palladio-cards-component/dist/palladio-cards-component.css" rel="stylesheet" />',
       '<link href="http://netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.css" rel="stylesheet">',
       '<script src="bower_components/palladio/palladio.js"></script>',
+      '<script src="bower_components/palladio-timeline-component/dist/palladio-timeline-component.min.js"></script>',
+      '<script src="bower_components/palladio-facet-component/dist/palladio-facet-component.min.js"></script>',
+      '<script src="bower_components/palladio-timespan-component/dist/palladio-timespan-component.min.js"></script>',
+      '<script src="bower_components/palladio-graph-component/dist/palladio-graph-component.min.js"></script>',
+      '<script src="bower_components/palladio-map-component/dist/palladio-map-component.min.js"></script>',
+      '<script src="bower_components/palladio-table-component/dist/palladio-table-component.min.js"></script>',
+      '<script src="bower_components/palladio-cards-component/dist/palladio-cards-component.js"></script>',
+      '<div id="mapView-id-here"></div>',
+      '<div id="graphView-id-here"></div>',
+      '<div id="tableView-id-here"></div>',
+      '<div id="listView-id-here"></div><!-- Actually the card view -->',
+      '<div id="timeline-id-here"></div>',
+      '<div id="timespan-id-here"></div>',
+      '<div id="facet-id-here"></div>',
       '<script>',
-      "var components = startPalladio();",
+      "var components = startPalladio(['palladioTimelineComponent', 'palladioFacetComponent', 'palladioTimespanComponent', 'palladioGraphComponent', 'palladioMapComponent', 'palladioTableComponent', 'palladioCardsComponent']);",
       "components.loadData('url-for-your-file.json', function() {",
       "});",
       '</script>'];
@@ -21,7 +42,7 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
     $scope.editorOptions = {
         lineWrapping : true,
         lineNumbers: true,
-        mode: 'html',
+        mode: 'htmlmixed'
     };
     
     $scope.addVisualization = function(visualization) {
@@ -178,12 +199,12 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
         'visualization.importJson.tooltipLabelDim': JSON.stringify(vis.importJson.tooltipLabelDim),
         'visualization.importJson.countDim.key': vis.importJson.countDim ? JSON.stringify(vis.importJson.countDim.key) : "",
         'visualization.importJson.tableDimensions.map\\(function\\(d\\) { return d.key; }\\)': vis.importJson.tableDimensions ? JSON.stringify(vis.importJson.tableDimensions.map(function(d) { return d.key; })) : "",
-        'visualization.importJson.titleDim': vis.importJson.titleDim,
-        'visualization.importJson.subtitleDim': vis.importJson.subtitleDim,
-        'visualization.importJson.textDim': vis.importJson.textDim,
-        'visualization.importJson.linkDim': vis.importJson.linkDim,
-        'visualization.importJson.imgurlDim': vis.importJson.imgurlDim,
-        'visualization.importJson.sortDim': vis.importJson.sortDim
+        'visualization.importJson.titleDim': JSON.stringify(vis.importJson.titleDim),
+        'visualization.importJson.subtitleDim': JSON.stringify(vis.importJson.subtitleDim),
+        'visualization.importJson.textDim': JSON.stringify(vis.importJson.textDim),
+        'visualization.importJson.linkDim': JSON.stringify(vis.importJson.linkDim),
+        'visualization.importJson.imgurlDim': JSON.stringify(vis.importJson.imgurlDim),
+        'visualization.importJson.sortDim': JSON.stringify(vis.importJson.sortDim)
       }
       var str = func.toString();
       for(var r in replacements) {
@@ -214,32 +235,41 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
           
           // Transform into individual component visualizations
           var filters = s.file.vis.filter(function(v) { return v.type === "palladioFilters"; })[0];
-          filters.importJson.facets.forEach(function(f) {
-            s.visualizations.push({type: "facet", description: "Facet Filter", importJson: f});
-          });
-          filters.importJson.timelines.forEach(function(f) {
-            s.visualizations.push({type: "timeline", description: "Timeline", importJson: f});
-          });
-          filters.importJson.partimes.forEach(function(f) {
-            s.visualizations.push({type: "timespan", description: "Timespan", importJson: f});
-          });
+          if(filters) {
+            filters.importJson.facets.forEach(function(f) {
+              s.visualizations.push({type: "facet", description: "Facet Filter", importJson: f});
+            });
+            filters.importJson.timelines.forEach(function(f) {
+              s.visualizations.push({type: "timeline", description: "Timeline", importJson: f});
+            });
+            filters.importJson.partimes.forEach(function(f) {
+              s.visualizations.push({type: "timespan", description: "Timespan", importJson: f});
+            }); 
+          }
           
           var mapView = s.file.vis.filter(function(v) { return v.type === "mapView"; })[0];
-          mapView.description = "Map";
-          s.visualizations.push(mapView);
+          if(mapView) {
+            mapView.description = "Map";
+            s.visualizations.push(mapView); 
+          }
           
           var graphView = s.file.vis.filter(function(v) { return v.type === "graphView"; })[0];
-          graphView.description = "Graph";
-          s.visualizations.push(graphView);
+          if(graphView) {
+            graphView.description = "Graph";
+            s.visualizations.push(graphView); 
+          }
           
           var tableView = s.file.vis.filter(function(v) { return v.type === 'tableView'; })[0];
-          tableView.description = "Table";
-          s.visualizations.push(tableView);
+          if(tableView) {
+            tableView.description = "Table";
+            s.visualizations.push(tableView); 
+          }
           
           var cardView = s.file.vis.filter(function(v) { return v.type === 'listView'; })[0];
-          cardView.description = "Cards";
-          s.visualizations.push(cardView);
-     
+          if(cardView) {
+            cardView.description = "Cards";
+            s.visualizations.push(cardView); 
+          }
         });
       };
       reader.readAsText(input.files[0]);
