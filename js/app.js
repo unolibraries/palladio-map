@@ -162,6 +162,7 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
     
     function loadFacet(visualization) {
       var newId = appendNewDivWithID(visualization);
+      console.log(visualization.importJson.dimKeys);
       components.promiseAdd('facet', newId, {
         height: "300px",
         showControls: false,
