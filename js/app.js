@@ -93,7 +93,7 @@ var app = angular.module('palladioEmbedApp', ['ui.codemirror'])
         height: 300
       }).then(function(opts) {
         opts.date(components.dimensionFromKey(visualization.importJson.dateProp));
-        opts.group(components.dimensionFromKey(visualization.importJson.groupProp));
+        opts.group(visualization.importJson.groupProp ? components.dimensionFromKey(visualization.importJson.groupProp) : null);
       });
     }
     

@@ -17,14 +17,21 @@
     "tests"
   ],
   "dependencies": {
-    "palladio": "1.2.0-beta.12",
-    "angular-ui-codemirror": "~0.3.0",
-    "palladio-timeline-component": "~1.0.2",
-    "palladio-facet-component": "~1.0.1",
-    "palladio-timespan-component": "~1.0.1",
-    "palladio-graph-component": "~1.0.1",
-    "palladio-map-component": "~1.0.1",
-    "palladio-table-component": "~1.0.1",
-    "palladio-cards-component": "~1.0.1"
+    "palladio": "^1.2.1",
+    "angular-ui-codemirror": "^0.3.0",
+    "palladio-timeline-component": "^1.0.4",
+    "palladio-facet-component": "^1.1.0",
+    "palladio-timespan-component": "^1.1.0",
+    "palladio-graph-component": "^1.0.1",
+    "palladio-map-component": "^1.1.3",
+    "palladio-table-component": "^1.1.2",
+    "palladio-cards-component": "^1.0.1"
+  },
+  "resolutions": {
+    "palladio": "^1.2.1",
+    "palladio-facet-component": "^1.1.0",
+    "palladio-timespan-component": "^1.1.0",
+    "palladio-map-component": "^1.1.3",
+    "palladio-table-component": "^1.1.2"
   }
 }
