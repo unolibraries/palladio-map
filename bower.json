@@ -17,7 +17,7 @@
     "tests"
   ],
   "dependencies": {
-    "palladio": "^1.2.1",
+    "palladio": "^1.2.2",
     "angular-ui-codemirror": "^0.3.0",
     "palladio-timeline-component": "^1.0.4",
     "palladio-facet-component": "^1.1.0",
